@@ -93,7 +93,16 @@ function createChart(data: any[]) {
   svg
     .append('g')
     .attr('transform', `translate(${marginLeft},0)`)
-    .call(d3.axisLeft(y).tickFormat((y: any) => y.toFixed()))
+    .call(
+      d3.axisLeft(y).tickFormat((y: any) => {
+        if (y >= 1000) {
+          return `${y / 1000}k`
+        } else if (y < 1) {
+          return y * 100 + '%' // Convert to percentage
+        }
+        return y.toFixed()
+      })
+    )
     .call((g: any) => g.select('.domain').remove())
     .call((g: any) =>
       g
@@ -142,7 +151,7 @@ watch(spreadsheetData, (newData) => {
 
   xAxisMetric.value = xAxisOptions[0]?.value || 0
   yAxisMetric.value = yAxisOptions[0]?.value || 0
-
+  console.log(newData)
   createChart(newData.slice(1)) // Skip headers
 })
 watch([xAxisMetric, yAxisMetric], ([newX, newY]) => {
